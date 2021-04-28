@@ -16,6 +16,8 @@
 		9A4F266E2633B4D300B8F4D6 /* SideslipTableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F266D2633B4D300B8F4D6 /* SideslipTableTests.swift */; };
 		9A4F26792633B4D300B8F4D6 /* SideslipTableUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F26782633B4D300B8F4D6 /* SideslipTableUITests.swift */; };
 		9A4F268A2633B56800B8F4D6 /* SideslipTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4F26892633B56800B8F4D6 /* SideslipTableView.swift */; };
+		9AE7736F26399FD100C4F238 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE7736E26399FD100C4F238 /* SectionHeader.swift */; };
+		9AE7737426399FF200C4F238 /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE7737326399FF200C4F238 /* ItemCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		9A4F26782633B4D300B8F4D6 /* SideslipTableUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideslipTableUITests.swift; sourceTree = "<group>"; };
 		9A4F267A2633B4D300B8F4D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A4F26892633B56800B8F4D6 /* SideslipTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideslipTableView.swift; sourceTree = "<group>"; };
+		9AE7736E26399FD100C4F238 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		9AE7737326399FF200C4F238 /* ItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +108,8 @@
 				9A4F26562633B4D200B8F4D6 /* AppDelegate.swift */,
 				9A4F26582633B4D200B8F4D6 /* SceneDelegate.swift */,
 				9A4F265A2633B4D200B8F4D6 /* ViewController.swift */,
+				9AE7736E26399FD100C4F238 /* SectionHeader.swift */,
+				9AE7737326399FF200C4F238 /* ItemCell.swift */,
 				9A4F26892633B56800B8F4D6 /* SideslipTableView.swift */,
 				9A4F265C2633B4D200B8F4D6 /* Main.storyboard */,
 				9A4F265F2633B4D300B8F4D6 /* Assets.xcassets */,
@@ -263,6 +269,8 @@
 			files = (
 				9A4F265B2633B4D200B8F4D6 /* ViewController.swift in Sources */,
 				9A4F26572633B4D200B8F4D6 /* AppDelegate.swift in Sources */,
+				9AE7737426399FF200C4F238 /* ItemCell.swift in Sources */,
+				9AE7736F26399FD100C4F238 /* SectionHeader.swift in Sources */,
 				9A4F268A2633B56800B8F4D6 /* SideslipTableView.swift in Sources */,
 				9A4F26592633B4D200B8F4D6 /* SceneDelegate.swift in Sources */,
 			);

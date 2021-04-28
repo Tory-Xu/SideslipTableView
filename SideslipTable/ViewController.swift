@@ -11,27 +11,52 @@ class ViewController: UIViewController {
 
     public static var cellId = "cellId"
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-
-        let slipTableView = SideslipTableView(frame: self.view.bounds, style: .plain)
+    lazy var slipTableView: SideslipTableView = {
+        let y: CGFloat = 200
+        let frame = CGRect(x: 0, y: y,
+                           width: self.view.frame.width,
+                           height: self.view.frame.height - y)
+        let slipTableView = SideslipTableView(frame: frame,
+                                              style: .plain)
         slipTableView.backgroundColor = .blue
         slipTableView.dataSource = self
         slipTableView.delegate = self
-        self.view.addSubview(slipTableView)
-        
         slipTableView.registerCell = { () -> (cellClass: AnyClass?, identifier: String) in
             return (ItemCell.self, ViewController.cellId)
         }
         slipTableView.registerSupplementaryView = { ()-> (cellClass: AnyClass?, kind: String, identifier: String) in
             return (SectionHeader.self, UICollectionView.elementKindSectionHeader, SectionHeader.headerId)
         }
-//        slipTableView.reloadData()
+        return slipTableView
+    }()
+    
+    @IBOutlet var menuView: UIView!
+    
+    @IBOutlet weak var refreshColTextField: UITextField!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+
+
+        self.view.addSubview(self.slipTableView)
     }
 
-
+    
+    @IBAction func reload(_ sender: Any) {
+        self.slipTableView.reloadData()
+    }
+    
+    @IBAction func refreshCol(_ sender: Any) {
+        let col = Int(self.refreshColTextField.text ?? "2")!
+        self.slipTableView.reloadHorizontalRow(row: col)
+    }
+    
+    @IBAction func refreshCols(_ sender: Any) {
+        self.slipTableView.reloadHorizontalRows(rows: [0, 2, 4])
+    }
+    
+    
 }
 
 extension ViewController: SideslipTableViewDataSource {
@@ -47,7 +72,9 @@ extension ViewController: SideslipTableViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath, indexPathForTableView: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ViewController.cellId, for: indexPath)
         if let itemCell = cell as? ItemCell {
-            itemCell.setupTitle("\(indexPathForTableView) - \(indexPath)")
+            let title = "\(indexPathForTableView) - \(indexPath)"
+            debugPrint(title)
+            itemCell.setupTitle(title)
         }
         return cell
     }
@@ -60,7 +87,9 @@ extension ViewController: SideslipTableViewDataSource {
             fatalError("获取视图失败")
         }
         
-        header.setupTitle("--header \(indexPathForTableView.row)")
+        let title = "--header \(indexPathForTableView.row)"
+        debugPrint(title)
+        header.setupTitle(title)
         return header
     }
 }
@@ -79,71 +108,9 @@ extension ViewController: SideslipTableViewDelegate {
     }
 }
 
-class SectionHeader: UICollectionReusableView {
-    
-    static var headerId = "SectionHeaderId"
-    
-    lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.setupUi()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public func setupTitle(_ title: String) {
-        self.titleLabel.text = title
-    }
-    
-    private func setupUi() {
-        self.backgroundColor = .white
-        self.addSubview(self.titleLabel)
-    }
-    
-    override func layoutSubviews() {
-        self.titleLabel.frame = self.bounds
-    }
-}
-
-class ItemCell: UICollectionViewCell {
-    
-    lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.setupUi()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public func setupTitle(_ title: String) {
-        self.titleLabel.text = title
-    }
-    
-    private func setupUi() {
-        self.contentView.backgroundColor = randomRGB()
-        self.contentView.addSubview(self.titleLabel)
-    }
-    
-    override func layoutSubviews() {
-        self.titleLabel.frame = self.contentView.bounds
-    }
-    
-}
-
-
 func randomRGB() -> UIColor {
-    return UIColor.init(red: CGFloat(arc4random()%256)/255.0, green: CGFloat(arc4random()%256)/255.0, blue: CGFloat(arc4random()%256)/255.0, alpha: 1)
+    return UIColor.init(red: CGFloat(arc4random()%256)/255.0,
+                        green: CGFloat(arc4random()%256)/255.0,
+                        blue: CGFloat(arc4random()%256)/255.0,
+                        alpha: 1)
 }

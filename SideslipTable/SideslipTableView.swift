@@ -172,15 +172,19 @@ extension SideslipTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = SideslipCell.slipCell(tableView: tableView)
         cell.collectionView.contentOffset = self.horizontalContentOffset
-        cell.collectionView.delegate = self
-        cell.collectionView.dataSource = self
         cell.collectionView.indexPathForAssociateCell = indexPath
-        if let (cellClass, identifier) = self.registerCell?() {
-            cell.collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
-        }
-        
-        if let (cellClass, kind, identifier) = self.registerSupplementaryView?() {
-            cell.collectionView.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
+        if cell.beReused {
+            cell.collectionView.reloadData()
+        } else {
+            cell.collectionView.delegate = self
+            cell.collectionView.dataSource = self
+            
+            if let (cellClass, identifier) = self.registerCell?() {
+                cell.collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+            }
+            if let (cellClass, kind, identifier) = self.registerSupplementaryView?() {
+                cell.collectionView.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
+            }
         }
         return cell
     }
@@ -302,11 +306,14 @@ private class SideslipCell: UITableViewCell {
     
     public let collectionView: SideslipCollectionView
     
+    private(set) var beReused = false
+    
     public class func slipCell(tableView: UITableView) -> SideslipCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? SideslipCell {
+            cell.beReused = true
             return cell
         }
-        
+
         let cell = SideslipCell(style: .default, reuseIdentifier: cellIdentifier)
         return cell
     }
