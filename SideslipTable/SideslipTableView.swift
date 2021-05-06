@@ -339,8 +339,8 @@ private class SideslipCell: UITableViewCell {
     }
     
     private func setupUi() {
-        // !!!: 未设置颜色，会导致 collectionView 无法接受到事件
-//        self.contentView.backgroundColor = .white
+        // !!!: 未设置颜色，会导致 collectionView 无法接受到事件，导致无法侧滑
+        self.contentView.backgroundColor = .white
         
         self.collectionView.showsVerticalScrollIndicator = false
         self.collectionView.showsHorizontalScrollIndicator = false
