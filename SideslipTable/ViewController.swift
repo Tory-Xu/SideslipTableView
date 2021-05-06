@@ -41,7 +41,12 @@ class ViewController: UIViewController {
 
         self.view.addSubview(self.slipTableView)
     }
-
+    
+    
+    // swift 注意：@objc 不能少
+    @objc func injected() {
+        self.slipTableView.reloadData()
+    }
     
     @IBAction func reload(_ sender: Any) {
         self.slipTableView.reloadData()
