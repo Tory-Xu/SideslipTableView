@@ -37,6 +37,8 @@ import UIKit
     
     @objc optional func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView?
     
+    @objc optional  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
+    
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath,
@@ -207,7 +209,7 @@ extension SideslipTableView: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        debugPrint("tableView did click at indexPath: \(indexPath)")
+        self.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
     }
 }
 
@@ -338,7 +340,7 @@ private class SideslipCell: UITableViewCell {
     
     private func setupUi() {
         // !!!: 未设置颜色，会导致 collectionView 无法接受到事件
-        self.contentView.backgroundColor = .white
+//        self.contentView.backgroundColor = .white
         
         self.collectionView.showsVerticalScrollIndicator = false
         self.collectionView.showsHorizontalScrollIndicator = false

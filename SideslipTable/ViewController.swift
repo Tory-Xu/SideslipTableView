@@ -95,16 +95,23 @@ extension ViewController: SideslipTableViewDataSource {
 }
 
 extension ViewController: SideslipTableViewDelegate {
+    static var rowHeight: CGFloat = 80
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        debugPrint("tableView did click at indexPath: \(indexPath)")
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath, indexPathForTableView: IndexPath) -> CGSize {
-        return CGSize(width: 100, height: 80)
+        return CGSize(width: 100, height: ViewController.rowHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int, indexPathForTableView: IndexPath) -> CGSize {
-        return CGSize(width: 100, height: 80)
+        return CGSize(width: 100, height: ViewController.rowHeight)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
+        return ViewController.rowHeight
     }
 }
 
