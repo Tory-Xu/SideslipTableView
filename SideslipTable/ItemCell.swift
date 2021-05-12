@@ -34,6 +34,7 @@ class ItemCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
+        super.layoutSubviews()
         self.titleLabel.frame = self.contentView.bounds
     }
     

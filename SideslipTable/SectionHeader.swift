@@ -35,6 +35,7 @@ class SectionHeader: UICollectionReusableView {
     }
     
     override func layoutSubviews() {
+        super.layoutSubviews()
         self.titleLabel.frame = self.bounds
     }
 }

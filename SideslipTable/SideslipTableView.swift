@@ -7,11 +7,19 @@
 
 import UIKit
 
-@objc public protocol SideslipTableViewDataSource: NSObjectProtocol {
+public enum SideCellType {
+    case slipCell(_ config: ((_ cell: SideslipCell)->Void)? = nil)
+    case customSlipCell(_ cell: SideslipCell)
+    case customCell(_ cell: UITableViewCell)
+}
+
+public protocol SideslipTableViewDataSource: NSObjectProtocol {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     
-    @objc optional func numberOfSections(in tableView: UITableView) -> Int // Default is 1 if not implemented
+    func numberOfSections(in tableView: UITableView) -> Int // Default is 1 if not implemented
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> SideCellType
     
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int,
@@ -25,6 +33,12 @@ import UIKit
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath,
                         indexPathForTableView: IndexPath) -> UICollectionReusableView
+}
+
+extension SideslipTableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int { return 1 }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> SideCellType { return .slipCell() }
 }
 
 @objc public protocol SideslipTableViewDelegate: NSObjectProtocol {
@@ -137,6 +151,7 @@ class SideslipTableView: UIView {
     }
     
     override func layoutSubviews() {
+        super.layoutSubviews()
         self.tableView.frame = self.bounds
     }
     
@@ -168,27 +183,42 @@ extension SideslipTableView: UITableViewDataSource {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return self.dataSource?.numberOfSections?(in: tableView) ?? 1
+        return self.dataSource?.numberOfSections(in: tableView) ?? 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = SideslipCell.slipCell(tableView: tableView)
-        cell.collectionView.contentOffset = self.horizontalContentOffset
-        cell.collectionView.indexPathForAssociateCell = indexPath
-        if cell.beReused {
-            cell.collectionView.reloadData()
+        
+        guard let cellType = self.dataSource?.tableView(tableView, cellForRowAt: indexPath) else {
+            fatalError("必须实现数据源")
+        }
+        
+        var slipCell: SideslipCell
+        switch cellType {
+        case let .slipCell(config):
+            slipCell = SideslipCell.slipCell(tableView: tableView)
+            config?(slipCell)
+        case let .customSlipCell(cell):
+            slipCell = cell
+        case let .customCell(cell):
+            return cell
+        }
+        
+        slipCell.collectionView.contentOffset = self.horizontalContentOffset
+        slipCell.collectionView.indexPathForAssociateCell = indexPath
+        if slipCell.beReused {
+            slipCell.collectionView.reloadData()
         } else {
-            cell.collectionView.delegate = self
-            cell.collectionView.dataSource = self
+            slipCell.collectionView.delegate = self
+            slipCell.collectionView.dataSource = self
             
             if let (cellClass, identifier) = self.registerCell?() {
-                cell.collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+                slipCell.collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
             }
             if let (cellClass, kind, identifier) = self.registerSupplementaryView?() {
-                cell.collectionView.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
+                slipCell.collectionView.register(cellClass, forSupplementaryViewOfKind: kind, withReuseIdentifier: identifier)
             }
         }
-        return cell
+        return slipCell
     }
     
 }
@@ -302,34 +332,39 @@ extension SideslipTableView: UICollectionViewDelegate, UICollectionViewDelegateF
 
 // MARK: SideslipCell
 
-private class SideslipCell: UITableViewCell {
+public class SideslipCell: UITableViewCell {
     
-    static var cellIdentifier = "SideslipCell"
+    /// 滑动区域四周间距
+    public var slipContentInsets: UIEdgeInsets = .zero
     
-    public let collectionView: SideslipCollectionView
-    
-    private(set) var beReused = false
-    
-    public class func slipCell(tableView: UITableView) -> SideslipCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? SideslipCell {
-            cell.beReused = true
-            return cell
-        }
-
-        let cell = SideslipCell(style: .default, reuseIdentifier: cellIdentifier)
-        return cell
-    }
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        
+    lazy public var collectionView: SideslipCollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         layout.sectionHeadersPinToVisibleBounds = true
         
-        self.collectionView = SideslipCollectionView(frame: .zero, collectionViewLayout: layout)
-        
+        let collectionView = SideslipCollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.bounces = false
+        collectionView.backgroundColor = .white
+        return collectionView
+    }()
+    
+    public var beReused = false
+    
+    public class func slipCell(tableView: UITableView, reuseId: String = "SideslipCellId") -> SideslipCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: reuseId) as? SideslipCell {
+            cell.beReused = true
+            return cell
+        }
+
+        let cell = SideslipCell(style: .default, reuseIdentifier: reuseId)
+        return cell
+    }
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.setupUi()
     }
@@ -341,24 +376,22 @@ private class SideslipCell: UITableViewCell {
     private func setupUi() {
         // !!!: 未设置颜色，会导致 collectionView 无法接受到事件，导致无法侧滑
         self.contentView.backgroundColor = .white
-        
-        self.collectionView.showsVerticalScrollIndicator = false
-        self.collectionView.showsHorizontalScrollIndicator = false
-        self.collectionView.bounces = false
-        self.collectionView.backgroundColor = .white
-//        self.collectionView.alwaysBounceVertical = true
-//        self.collectionView.alwaysBounceHorizontal = true
-        
         self.addSubview(self.collectionView)
     }
     
-    override func layoutSubviews() {
-        self.collectionView.frame = self.bounds
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        let width = self.bounds.width - self.slipContentInsets.left - self.slipContentInsets.right
+        let height = self.bounds.height - self.slipContentInsets.top - self.slipContentInsets.bottom
+        self.collectionView.frame = CGRect(x: self.slipContentInsets.left,
+                                           y: self.slipContentInsets.top,
+                                           width: width,
+                                           height: height)
     }
     
 }
 
-private class SideslipCollectionView: UICollectionView {
+public class SideslipCollectionView: UICollectionView {
     var indexPathForAssociateCell: IndexPath?
 }
 
