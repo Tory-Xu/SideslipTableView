@@ -389,6 +389,16 @@ public class SideslipCell: UITableViewCell {
                                            height: height)
     }
     
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let response = super.hitTest(point, with: event)
+        debugPrint("hit test responder is: \(String(describing: response))")
+        if response == nil {
+             return self.collectionView
+        } else {
+            return response
+        }
+    }
+
 }
 
 public class SideslipCollectionView: UICollectionView {
