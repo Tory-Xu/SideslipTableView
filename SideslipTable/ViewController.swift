@@ -8,7 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     public static var cellId = "cellId"
     
     lazy var slipTableView: SideslipTableView = {
@@ -37,8 +37,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-
-
+        
+        
         self.view.addSubview(self.slipTableView)
     }
     
@@ -65,7 +65,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: SideslipTableViewDataSource {
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
     }
@@ -174,7 +174,7 @@ class CustomSlieslipCell: SideslipCell {
             cell.beReused = true
             return cell
         }
-
+        
         let cell = CustomSlieslipCell(style: .default, reuseIdentifier: reuseId)
         return cell
     }
@@ -189,7 +189,11 @@ class CustomSlieslipCell: SideslipCell {
     }
     
     private func setupUi() {
-        self.slipContentInsets = UIEdgeInsets(top: 0, left: 10, bottom: CustomSlieslipCell.reloadButtonSize.height, right: 0)
+        self.contentView.backgroundColor = .black
+        self.slipContentInsets = UIEdgeInsets(top: 0,
+                                              left: 10,
+                                              bottom: CustomSlieslipCell.reloadButtonSize.height,
+                                              right: 0)
         
         self.contentView.addSubview(self.reloadButton)
     }
